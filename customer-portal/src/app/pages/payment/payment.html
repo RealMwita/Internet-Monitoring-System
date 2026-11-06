@@ -1,0 +1,23 @@
+<section class="checkout-layout enter">
+    <div class="checkout-intro">
+        <a class="back-link" [routerLink]="['/',tenantService.companySlug(),'packages']" queryParamsHandling="preserve"><span aria-hidden="true">←</span> All packages</a>
+        <h1>{{ cashMode ? 'Pay with cash' : 'Pay with Mobile Money' }}</h1>
+    </div>
+    <div class="checkout-panel">
+        @if (loadingPackage()) { <div class="loading-state" role="status"><span class="spinner"></span> Loading your package…</div> }
+        @if (packageItem(); as item) {
+            <div class="order-summary"><div><h2>{{ packageService.formatDuration(item.duration_minutes) }}</h2><p>{{ item.name }}</p></div><div class="order-price"><small>TZS</small><strong>{{ item.price | number:'1.0-2' }}</strong></div></div>
+            <form [formGroup]="paymentForm" (ngSubmit)="initiatePayment()">
+                <label for="phone">Mobile number @if (cashMode) { <span>(optional)</span> }</label>
+                <div class="phone-field" [class.invalid]="phoneNumber.touched && phoneNumber.invalid"><span class="phone-prefix">+255</span><input id="phone" nmsSubscriberPhone formControlName="phoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="9" placeholder="712 345 678" aria-describedby="phone-help" [attr.aria-invalid]="phoneNumber.touched && phoneNumber.invalid" [readOnly]="submitting() || uncertain()" /></div>
+                <p id="phone-help" class="field-help" [class.field-error]="phoneNumber.touched && phoneNumber.invalid">@if (phoneNumber.touched && phoneNumber.invalid) { Enter 9 digits starting with 6 or 7, without the first 0. }</p>
+                @if (errorMessage()) { <p class="notice notice-error" role="alert">{{ errorMessage() }}</p> }
+                @if (uncertain()) { <button type="button" class="button full" (click)="recoverRequest()">Check my request <span aria-hidden="true">→</span></button> }
+                @else { <button type="submit" class="button full" [disabled]="submitting()"><span>{{ submitting() ? 'Sending request…' : cashMode ? 'Request cash payment' : 'Pay TZS ' + (item.price | number:'1.0-2') }}</span>@if (submitting()) { <span class="spinner"></span> } @else { <span aria-hidden="true">→</span> }</button> }
+            </form>
+            @if (!submitting() && !uncertain()) {
+                <div class="payment-alternative"><a [routerLink]="['/',tenantService.companySlug(),cashMode ? 'payment' : 'cash-payment',item.id]" queryParamsHandling="preserve">{{ cashMode ? 'Pay with Mobile Money instead' : 'Pay in person instead' }}</a></div>
+            }
+        } @else if (!loadingPackage()) { <div class="state-panel" role="alert"><h2>Package unavailable</h2><p>{{ errorMessage() }}</p><a class="button" [routerLink]="['/',tenantService.companySlug(),'packages']">Back to packages</a></div> }
+    </div>
+</section>

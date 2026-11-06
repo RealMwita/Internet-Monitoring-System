@@ -1,0 +1,594 @@
+<div class="settings-page">
+  <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+  <header class="page-heading">
+    <div>
+      <p>COMPANY SETTINGS</p>
+
+      <h1>Profile & Branding</h1>
+
+      <span>
+        Manage your company identity, portal appearance, branding images, and
+        administrator account.
+      </span>
+    </div>
+
+    <ion-button
+      fill="outline"
+      size="small"
+      (click)="load()"
+      [disabled]="loading()"
+    >
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+
+      Refresh
+    </ion-button>
+  </header>
+
+  <!-- =====================================================
+         LOADING
+         ===================================================== -->
+
+  @if (loading()) {
+
+  <section class="state-card">
+    <ion-spinner name="crescent"></ion-spinner>
+
+    <div>
+      <strong> Loading company settings </strong>
+
+      <p>Fetching your company profile and branding.</p>
+    </div>
+  </section>
+
+  }
+
+  <!-- =====================================================
+         LOAD ERROR
+         ===================================================== -->
+
+  @else if (error()) {
+
+  <section class="state-card error-state">
+    <h2>Settings unavailable</h2>
+
+    <p>Your company profile could not be loaded.</p>
+
+    <ion-button (click)="load()"> Try again </ion-button>
+  </section>
+
+  }
+
+  <!-- =====================================================
+         SETTINGS CONTENT
+         ===================================================== -->
+
+  @else {
+  @if (company(); as currentCompany) {
+
+  <!-- =================================================
+             COMPANY IDENTITY
+             ================================================= -->
+
+  <section class="company-banner">
+    <div class="company-banner__logo">
+      @if (logoUrl()) {
+
+      <img
+        [src]="publicImageUrl(logoUrl())"
+        [alt]="currentCompany.name + ' logo'"
+      />
+
+      } @else {
+
+      <ion-icon name="business-outline"></ion-icon>
+
+      }
+    </div>
+
+    <div class="company-banner__identity">
+      <span> YOUR COMPANY </span>
+
+      <h2>{{ currentCompany.name }}</h2>
+
+      <p>/{{ currentCompany.slug }}</p>
+    </div>
+
+    <div
+      class="company-status"
+      [class.company-status--active]="
+                    currentCompany.status === 'active'
+                "
+    >
+      <i></i>
+
+      {{ currentCompany.status === 'active' ? 'Active company' :
+      currentCompany.status }}
+    </div>
+  </section>
+
+  <!-- =================================================
+             GLOBAL MESSAGES
+             ================================================= -->
+
+  @if (formError()) {
+
+  <section class="inline-message inline-message--error">
+    <ion-icon name="close-circle-outline"></ion-icon>
+
+    <span> {{ formError() }} </span>
+  </section>
+
+  } @if ( profileSuccess() || brandingSuccess() ) {
+
+  <section class="inline-message inline-message--success">
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+
+    <span> {{ brandingSuccess() || profileSuccess() }} </span>
+  </section>
+
+  }
+
+  <!-- =================================================
+             COMPANY PROFILE
+             ================================================= -->
+
+  <section class="settings-card">
+    <header class="settings-card__header">
+      <div>
+        <span class="section-eyebrow"> COMPANY PROFILE </span>
+
+        <h2>Business information</h2>
+
+        <p>
+          These details identify your company throughout the administration
+          system and customer portal.
+        </p>
+      </div>
+
+      <ion-icon name="business-outline"></ion-icon>
+    </header>
+
+    <form
+      class="settings-form"
+      [formGroup]="profileForm"
+      (ngSubmit)="saveProfile()"
+    >
+      <div class="form-grid">
+        <label class="form-field">
+          <span> Company name </span>
+
+          <ion-input
+            formControlName="name"
+            placeholder="Company name"
+          ></ion-input>
+
+          @if ( profileForm.controls.name.touched &&
+          profileForm.controls.name.invalid ) {
+
+          <small class="field-error"> Enter a valid company name. </small>
+
+          }
+        </label>
+
+        <label class="form-field">
+          <span> Email address </span>
+
+          <ion-input
+            type="email"
+            formControlName="email"
+            placeholder="company@example.com"
+          ></ion-input>
+        </label>
+
+        <label class="form-field">
+          <span> Phone number </span>
+
+          <ion-input formControlName="phone" placeholder="+255..."></ion-input>
+        </label>
+
+        <label class="form-field">
+          <span> Address </span>
+
+          <ion-input
+            formControlName="address"
+            placeholder="Company address"
+          ></ion-input>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <ion-button
+          type="button"
+          fill="outline"
+          (click)="resetProfile()"
+          [disabled]="savingProfile()"
+        >
+          Reset
+        </ion-button>
+
+        <ion-button
+          type="submit"
+          [disabled]="
+                            savingProfile() ||
+                            profileForm.invalid
+                        "
+        >
+          @if (savingProfile()) {
+
+          <ion-spinner slot="start" name="crescent"></ion-spinner>
+
+          } @else {
+
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+
+          } Save profile
+        </ion-button>
+      </div>
+    </form>
+  </section>
+  <!-- =================================================
+             COMPANY BRANDING (UNIFIED)
+             ================================================= -->
+
+  <section class="settings-card branding-unified-card">
+    <header class="settings-card__header">
+      <div>
+        <span class="section-eyebrow"> COMPANY BRANDING </span>
+        <h2>Brand Identity & Customer Portal Appearance</h2>
+        <p>
+          Configure the branding elements shared between your company administration portal
+          and customer Wi-Fi portal.
+        </p>
+      </div>
+      <ion-icon name="color-palette-outline"></ion-icon>
+    </header>
+
+    <div class="branding-unified-grid">
+      <!-- LEFT COLUMN: CONTROLS -->
+      <div class="branding-controls-column">
+        <!-- 1. COMPANY LOGO -->
+        <div class="branding-field-group">
+          <label class="group-title">Company Logo</label>
+          <p class="group-description">Appears in sidebar, header, and customer Wi-Fi portal.</p>
+          <div class="asset-uploader-row">
+            <div class="asset-preview-box logo-box">
+              @if (logoUrl()) {
+                <img [src]="publicImageUrl(logoUrl())" [alt]="currentCompany.name + ' logo'" />
+              } @else {
+                <div class="empty-asset">
+                  <ion-icon name="image-outline"></ion-icon>
+                  <span>No logo</span>
+                </div>
+              }
+            </div>
+
+            <div class="asset-buttons">
+              <label class="asset-upload-btn" [class.is-busy]="uploadingLogo()">
+                @if (uploadingLogo()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                  <span>Uploading…</span>
+                } @else {
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  <span>{{ logoUrl() ? 'Replace Logo' : 'Upload Logo' }}</span>
+                }
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  [disabled]="uploadingLogo()"
+                  (change)="onLogoSelected($event)"
+                />
+              </label>
+
+              @if (logoUrl()) {
+                <button type="button" class="asset-remove-btn" [disabled]="removingLogo()" (click)="removeLogo()">
+                  <ion-icon name="trash-outline"></ion-icon>
+                  <span>Remove</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CUSTOMER PORTAL BANNER -->
+        <div class="branding-field-group">
+          <label class="group-title">Customer Portal Banner</label>
+          <p class="group-description">Hero banner image displayed atop the customer Wi-Fi portal.</p>
+          <div class="asset-uploader-row">
+            <div class="asset-preview-box banner-box">
+              @if (bannerImageUrl()) {
+                <img [src]="publicImageUrl(bannerImageUrl())" alt="Customer portal banner" />
+              } @else {
+                <div class="empty-asset banner-placeholder">
+                  <span>Default Sunset Wi-Fi Banner</span>
+                </div>
+              }
+            </div>
+
+            <div class="asset-buttons">
+              <label class="asset-upload-btn" [class.is-busy]="uploadingBanner()">
+                @if (uploadingBanner()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                  <span>Uploading…</span>
+                } @else {
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  <span>{{ bannerImageUrl() ? 'Replace Banner' : 'Upload Banner' }}</span>
+                }
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  [disabled]="uploadingBanner()"
+                  (change)="onBannerSelected($event)"
+                />
+              </label>
+
+              @if (bannerImageUrl()) {
+                <button type="button" class="asset-remove-btn" [disabled]="removingBanner()" (click)="removeBanner()">
+                  <ion-icon name="trash-outline"></ion-icon>
+                  <span>Remove</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BRAND COLORS FORM -->
+        <form class="branding-form" [formGroup]="brandingForm" (ngSubmit)="saveBranding()">
+          <div class="color-inputs-grid">
+            <label class="color-picker-item">
+              <span class="color-label">Primary Color</span>
+              <div class="color-picker-box">
+                <input type="color" formControlName="primary_color" />
+                <input type="text" formControlName="primary_color" class="color-hex-text" />
+              </div>
+            </label>
+
+            <label class="color-picker-item">
+              <span class="color-label">Secondary or Accent Color</span>
+              <div class="color-picker-box">
+                <input type="color" formControlName="accent_color" />
+                <input type="text" formControlName="accent_color" class="color-hex-text" />
+              </div>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <ion-button
+              type="button"
+              fill="outline"
+              size="small"
+              (click)="resetBranding()"
+              [disabled]="savingBranding()"
+            >
+              Reset
+            </ion-button>
+
+            <ion-button
+              type="submit"
+              size="small"
+              [disabled]="savingBranding() || brandingForm.invalid"
+            >
+              @if (savingBranding()) {
+                <ion-spinner slot="start" name="crescent"></ion-spinner>
+              } @else {
+                <ion-icon slot="start" name="save-outline"></ion-icon>
+              }
+              Save Branding
+            </ion-button>
+          </div>
+        </form>
+      </div>
+
+      <!-- RIGHT COLUMN: LIVE PREVIEW -->
+      <div class="branding-preview-column">
+        <div class="preview-title-bar">
+          <strong>Live Preview</strong>
+          <small>Customer portal appearance</small>
+        </div>
+
+        <div class="preview-mobile-device" [style.background]="previewBranding()['--company-background']">
+          <!-- Status Bar -->
+          <div class="preview-status-bar">
+            <span>9:41</span>
+            <div class="status-bar-icons">
+              <ion-icon name="wifi-outline"></ion-icon>
+              <ion-icon name="card-outline"></ion-icon>
+            </div>
+          </div>
+
+          <!-- Header -->
+          <div class="preview-mobile-header">
+            <div class="preview-mobile-brand">
+              @if (logoUrl()) {
+                <img [src]="publicImageUrl(logoUrl())" alt="Logo preview" />
+              } @else {
+                <span class="preview-logo-symbol" [style.color]="previewBranding()['--company-primary']">
+                  <ion-icon name="wifi-outline"></ion-icon>
+                </span>
+              }
+              <div class="preview-mobile-brand-text">
+                <strong>{{ currentCompany.name }}</strong>
+                <small [style.color]="previewBranding()['--company-accent']">STAY CONNECTED</small>
+              </div>
+            </div>
+            <span class="preview-mobile-lang">EN ▾</span>
+          </div>
+
+          <!-- Hero Banner -->
+          <div class="preview-mobile-hero" [class.has-banner]="bannerImageUrl()">
+            @if (bannerImageUrl()) {
+              <img [src]="publicImageUrl(bannerImageUrl())" class="preview-hero-bg" alt="Banner" />
+            }
+            <div class="preview-hero-overlay">
+              <span>Welcome to</span>
+              <strong>{{ currentCompany.name }} Wi-Fi</strong>
+              <p>Fast. Reliable. Affordable.</p>
+            </div>
+          </div>
+
+          <!-- Package Section -->
+          <div class="preview-mobile-content">
+            <div class="preview-section-heading">
+              <span class="heading-wifi-icon" [style.color]="previewBranding()['--company-primary']">
+                <ion-icon name="wifi-outline"></ion-icon>
+              </span>
+              <div>
+                <strong>Choose a package</strong>
+                <small>Get connected in seconds.</small>
+              </div>
+            </div>
+
+            <!-- Package Card 1 -->
+            <div class="preview-pkg-card">
+              <div class="pkg-card-left">
+                <strong>1 Hour</strong>
+                <small>Perfect for quick access</small>
+              </div>
+              <div class="pkg-card-right">
+                <span class="pkg-price">TZS 500</span>
+                <span
+                  class="pkg-pay-btn"
+                  [style.background]="previewBranding()['--company-primary']"
+                  [style.color]="previewBranding()['--on-primary']"
+                >
+                  Pay →
+                </span>
+              </div>
+            </div>
+
+            <!-- Package Card 2 -->
+            <div class="preview-pkg-card">
+              <div class="pkg-card-left">
+                <strong>6 Hours</strong>
+                <small>Great for longer browsing</small>
+              </div>
+              <div class="pkg-card-right">
+                <span class="pkg-price">TZS 2,000</span>
+                <span
+                  class="pkg-pay-btn"
+                  [style.background]="previewBranding()['--company-primary']"
+                  [style.color]="previewBranding()['--on-primary']"
+                >
+                  Pay →
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+             PAYMENT SETTINGS
+             ================================================= -->
+  <app-selcom-settings />
+
+  <!-- =================================================
+             ADMINISTRATOR ACCOUNT
+             ================================================= -->
+
+  @if (auth.admin(); as admin) {
+
+  <section class="settings-card">
+    <header class="settings-card__header">
+      <div>
+        <span class="section-eyebrow"> ADMINISTRATOR </span>
+
+        <h2>Your account</h2>
+
+        <p>
+          The account currently authorized to manage {{ currentCompany.name }}.
+        </p>
+      </div>
+
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+    </header>
+
+    <div class="profile-hero">
+      <span> {{ initials() }} </span>
+
+      <div>
+        <p>AUTHORIZED ADMINISTRATOR</p>
+
+        <h2>{{ admin.name }}</h2>
+
+        <small> {{ admin.email }} </small>
+      </div>
+
+      <b>
+        <i></i>
+
+        {{ admin.status === 'active' ? 'Account active' : admin.status }}
+      </b>
+    </div>
+
+    <div class="profile-details">
+      <article>
+        <span>
+          <ion-icon name="person-outline"></ion-icon>
+        </span>
+
+        <div>
+          <small> FULL NAME </small>
+
+          <strong> {{ admin.name }} </strong>
+        </div>
+      </article>
+
+      <article>
+        <span>
+          <ion-icon name="mail-outline"></ion-icon>
+        </span>
+
+        <div>
+          <small> EMAIL ADDRESS </small>
+
+          <strong> {{ admin.email }} </strong>
+        </div>
+      </article>
+
+      <article>
+        <span>
+          <ion-icon name="business-outline"></ion-icon>
+        </span>
+
+        <div>
+          <small> COMPANY </small>
+
+          <strong> {{ currentCompany.name }} </strong>
+        </div>
+      </article>
+
+      <article>
+        <span>
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </span>
+
+        <div>
+          <small> ACCESS LEVEL </small>
+
+          <strong> Company administrator </strong>
+        </div>
+      </article>
+    </div>
+
+    <footer class="account-footer">
+      <div>
+        <strong> End administrator session </strong>
+
+        <small> You will return to the secure login screen. </small>
+      </div>
+
+      <ion-button color="danger" fill="outline" (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+
+        Log out
+      </ion-button>
+    </footer>
+  </section>
+
+  } } }
+</div>

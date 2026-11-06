@@ -1,0 +1,182 @@
+/* =========================================================
+   STATUS CARD
+   ========================================================= */
+
+.status-card {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 16px;
+
+    border: 1px solid var(
+        --border,
+        var(--company-background)
+    );
+
+    border-radius: 12px;
+
+    background: var(
+        --surface-soft,
+        #FFFFFF
+    );
+
+    color: var(
+        --company-secondary,
+        var(--company-text)
+    );
+}
+
+
+/* =========================================================
+   STATUS INDICATOR
+   ========================================================= */
+
+.status-card__icon {
+    flex: 0 0 12px;
+
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+
+    background: var(--company-accent);
+
+    box-shadow:
+        0 0 0 5px
+        var(--company-background);
+}
+
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+.status-card__label,
+.status-card__value,
+.status-card__description {
+    margin: 0;
+}
+
+
+.status-card__label {
+    color: var(
+        --text-muted,
+        var(--company-accent)
+    );
+
+    font-size:1rem;
+    font-weight: 650;
+}
+
+
+.status-card__value {
+    margin-top: 2px;
+
+    font-size:1rem;
+    font-weight: 740;
+
+    letter-spacing: 0.045em;
+}
+
+
+.status-card__description {
+    margin-top: 4px;
+
+    color: var(
+        --text-muted,
+        var(--company-accent)
+    );
+
+    font-size:1rem;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   SUCCESS STATE
+   ========================================================= */
+
+.status-card[data-tone='success'] {
+    border-color: var(--company-background);
+
+    background: #FFFFFF;
+
+    color: var(--company-text);
+}
+
+
+.status-card[data-tone='success']
+.status-card__icon {
+    background: var(--company-primary);
+
+    box-shadow:
+        0 0 0 5px
+        var(--company-background);
+}
+
+
+/* =========================================================
+   PENDING STATE
+   ========================================================= */
+
+.status-card[data-tone='pending'] {
+    border-color: #fed7aa;
+
+    background: #fff7ed;
+
+    color: #c2410c;
+}
+
+
+.status-card[data-tone='pending']
+.status-card__icon {
+    background: #f97316;
+
+    box-shadow:
+        0 0 0 5px
+        var(--brand-soft);
+}
+
+
+/* =========================================================
+   DANGER STATE
+   ========================================================= */
+
+.status-card[data-tone='danger'] {
+    border-color: #fecaca;
+
+    background: #fef2f2;
+
+    color: #b42318;
+}
+
+
+.status-card[data-tone='danger']
+.status-card__icon {
+    background: #dc2626;
+
+    box-shadow:
+        0 0 0 5px
+        #fee2e2;
+}
+
+
+/* =========================================================
+   NEUTRAL STATE
+   ========================================================= */
+
+.status-card[data-tone='neutral'] {
+    border-color: var(
+        --border,
+        var(--company-background)
+    );
+
+    background: #FFFFFF;
+
+    color: var(
+        --company-secondary,
+        var(--company-text)
+    );
+}

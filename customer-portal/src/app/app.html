@@ -1,0 +1,18 @@
+<div class="app-shell">
+    @if (tenantService.company(); as company) {
+        <header class="portal-header">
+            <a class="brand" [routerLink]="['/',company.slug,'packages']" queryParamsHandling="preserve" [attr.aria-label]="company.name + ' internet packages'">
+                @if (getPublicFileUrl(company.logo_url); as logoUrl) { <img class="brand-logo" [src]="logoUrl" [alt]="company.name + ' logo'" /> }
+                @else { <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M6 17c8-9 20-9 28 0M12 23c5-6 11-6 16 0M17 29c2-2 4-2 6 0" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg></span> }
+                <span class="brand-wordmark"><strong>{{ company.name }}</strong><small>STAY CONNECTED</small></span>
+            </a>
+            <nav class="portal-nav" aria-label="Main navigation"><a [routerLink]="['/',company.slug,'packages']" queryParamsHandling="preserve" routerLinkActive="nav-active">Packages</a><a [routerLink]="['/',company.slug,'company']" routerLinkActive="nav-active">Help <span aria-hidden="true">↗</span></a><app-language-switcher /></nav>
+        </header>
+    } @else {
+        <app-language-switcher class="floating" />
+    }
+    <main class="page-area" id="main-content"><router-outlet /></main>
+    @if (tenantService.company(); as company) {
+        <footer class="portal-footer"><span>{{ company.name }} <span class="footer-dot">·</span> A little more connected.</span><a [routerLink]="['/',company.slug,'company']">Get in touch <span aria-hidden="true">↗</span></a></footer>
+    }
+</div>

@@ -1,0 +1,14 @@
+<section class="contact-page enter">
+    <a class="back-link" [routerLink]="['/',tenantService.companySlug(),'packages']">← Back to packages</a>
+    <span class="eyebrow">HERE TO HELP</span><h1>A real person.<br/>A little help.</h1><p>Questions about your connection or payment? Get in touch with your Wi-Fi provider.</p>
+    @if (loading()) { <div class="loading-state" role="status"><span class="spinner"></span> Loading contact details…</div> }
+    @if (errorMessage()) { <p class="notice notice-error" role="alert">{{ errorMessage() }}</p> }
+    @if (company(); as provider) {
+        <div class="contact-details"><h2>{{ provider.name }}</h2>
+            @if (provider.phone) { <a [href]="'tel:'+provider.phone"><span>Call us</span><strong>{{ provider.phone }} <span aria-hidden="true">↗</span></strong></a> }
+            @if (provider.email) { <a [href]="'mailto:'+provider.email"><span>Email us</span><strong>{{ provider.email }} <span aria-hidden="true">↗</span></strong></a> }
+            @if (provider.address) { <div><span>Find us</span><strong>{{ provider.address }}</strong></div> }
+            @if (!provider.phone && !provider.email && !provider.address) { <p>Ask the staff at your Wi-Fi location for help.</p> }
+        </div>
+    }
+</section>

@@ -1,0 +1,347 @@
+<main class="page-shell cash-page">
+
+<!-- ======================================================
+     BACK TO PAYMENT OPTIONS
+     ====================================================== -->
+
+@if (
+    tenantService.companySlug() &&
+    packageItem()
+) {
+
+    <a
+        class="back-link"
+        [routerLink]="[
+            '/',
+            tenantService.companySlug(),
+            'payment',
+            packageItem()!.id
+        ]"
+    >
+        ← Back to payment options
+    </a>
+
+}
+
+
+<!-- ======================================================
+     LOADING STATE
+     ====================================================== -->
+
+@if (loading()) {
+
+    <section class="cash-card">
+
+        <p>
+            Loading package...
+        </p>
+
+    </section>
+
+}
+
+
+<!-- ======================================================
+     PACKAGE UNAVAILABLE
+     ====================================================== -->
+
+@else if (!packageItem()) {
+
+    <section
+        class="cash-card cash-card--error"
+        role="alert"
+    >
+
+        <h1>
+            Package unavailable
+        </h1>
+
+        <p>
+            {{ errorMessage() }}
+        </p>
+
+
+        @if (tenantService.companySlug()) {
+
+            <a
+                class="button button--primary"
+                [routerLink]="[
+                    '/',
+                    tenantService.companySlug(),
+                    'packages'
+                ]"
+            >
+                Choose another package
+            </a>
+
+        }
+
+    </section>
+
+}
+
+
+<!-- ======================================================
+     CASH PAYMENT PAGE
+     ====================================================== -->
+
+@else {
+
+    <!-- Page heading -->
+    <header class="cash-heading">
+
+        <span class="cash-label">
+            Cash payment
+        </span>
+
+        <h1>
+            Request to pay with cash
+        </h1>
+
+        <p>
+            Submit a cash payment request first.
+            You will receive a reference that the administrator
+            can use to confirm your payment.
+        </p>
+
+    </header>
+
+
+    <div class="cash-layout">
+
+
+        <!-- ==================================================
+             SELECTED PACKAGE
+             ================================================== -->
+
+        <aside
+            class="package-summary"
+            aria-label="Selected package summary"
+        >
+
+            <span class="package-summary__label">
+                Selected package
+            </span>
+
+
+            <h2>
+                {{ packageItem()!.name }}
+            </h2>
+
+
+            <p class="package-summary__price">
+
+                <span>
+                    TZS
+                </span>
+
+                {{
+                    packageItem()!.price.toLocaleString()
+                }}
+
+            </p>
+
+
+            <dl>
+
+                <div>
+
+                    <dt>
+                        Duration
+                    </dt>
+
+                    <dd>
+                        {{
+                            packageService.formatDuration(
+                                packageItem()!.duration_minutes
+                            )
+                        }}
+                    </dd>
+
+                </div>
+
+
+            </dl>
+
+        </aside>
+
+
+        <!-- ==================================================
+             CASH REQUEST FORM
+             ================================================== -->
+
+        <section class="cash-card">
+
+            <div class="cash-card__heading">
+
+                <span
+                    class="cash-icon"
+                    aria-hidden="true"
+                >
+                    $
+                </span>
+
+
+                <div>
+
+                    <h2>
+                        Cash payment request
+                    </h2>
+
+                    <p>
+                        Submit your request and give the payment reference
+                        to the administrator. A phone number is required.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                novalidate
+                (submit)="$event.preventDefault(); requestCashPayment()"
+            >
+
+                <!-- ==========================================
+                     PHONE NUMBER
+                     ========================================== -->
+
+                <div class="phone-field">
+
+                    <label for="cashPhone">
+                        Phone number (required)
+                    </label>
+
+
+                    <div class="phone-input-wrap">
+
+                        <span aria-hidden="true">
+                            +255
+                        </span>
+
+
+                        <input
+                            id="cashPhone"
+                            type="tel"
+                            required
+                            inputmode="numeric"
+                            autocomplete="tel-national"
+                            [formControl]="phoneNumber"
+                            placeholder="712345678"
+                            maxlength="9"
+                            nmsSubscriberPhone
+                            aria-describedby="cashPhoneHint cashPhoneError"
+                        />
+
+                    </div>
+
+
+                    <p
+                        id="cashPhoneHint"
+                        class="field-hint"
+                    >
+                        Enter 9 digits
+                        starting with 6 or 7. +255 is added automatically.
+                    </p>
+
+
+                    @if (
+                        phoneNumber.touched &&
+                        phoneNumber.invalid
+                    ) {
+
+                        <p
+                            id="cashPhoneError"
+                            class="field-error"
+                            role="alert"
+                        >
+                            @if (phoneNumber.hasError('required')) {
+                                Phone number is required.
+                            } @else {
+                                Enter a valid Tanzanian mobile number,
+                                for example 712345678.
+                            }
+                        </p>
+
+                    }
+
+                </div>
+
+
+                <!-- ==========================================
+                     REQUEST ERROR
+                     ========================================== -->
+
+                @if (errorMessage()) {
+
+                    <div
+                        class="inline-alert"
+                        role="alert"
+                    >
+                        {{ errorMessage() }}
+                    </div>
+
+                }
+
+
+                <!-- ==========================================
+                     WHAT HAPPENS NEXT
+                     ========================================== -->
+
+                <div class="cash-info">
+
+                    <strong>
+                        What happens next?
+                    </strong>
+
+                    <p>
+                        After submitting this form, you will
+                        receive a cash payment reference.
+                        Give that reference to the administrator
+                        when making your payment.
+                    </p>
+
+                    <p>
+                        Your internet package will only be
+                        activated after the administrator
+                        confirms that the cash has been received.
+                    </p>
+
+                </div>
+
+
+                <!-- ==========================================
+                     SUBMIT REQUEST
+                     ========================================== -->
+
+                <button
+                    type="submit"
+                    class="button button--primary button--full"
+                    [disabled]="
+                        phoneNumber.invalid ||
+                        submitting()
+                    "
+                >
+
+                    @if (submitting()) {
+
+                        Submitting request...
+
+                    } @else {
+
+                        Request cash payment
+
+                    }
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+}
+
+</main>

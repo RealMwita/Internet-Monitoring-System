@@ -1,0 +1,5 @@
+<article class="package-row" [class.is-selected]="isSelected()">
+  <div class="package-description"><h2>{{ packageService.formatDuration(packageItem().duration_minutes) }}</h2>@if (packageItem().name !== packageService.formatDuration(packageItem().duration_minutes)) { <p>{{ packageItem().name }}</p> }</div>
+  <div class="package-price"><span>TZS</span><strong>{{ packageItem().price.toLocaleString('en-TZ') }}</strong></div>
+  <button type="button" [disabled]="disabled()" (click)="choosePackage()" [attr.aria-label]="'Pay TZS ' + packageItem().price + ' for ' + packageService.formatDuration(packageItem().duration_minutes)">{{ isSelected() ? 'Opening?' : 'Pay' }} <span aria-hidden="true">?</span></button>
+</article>
